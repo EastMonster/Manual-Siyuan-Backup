@@ -191,7 +191,7 @@ def unzip(wpath: str, bpath: str) -> None:
     target = ""
     try:
         index = int(input())
-        target = flist[index]
+        target = flist[index - 1]
     except IndexError:
         error("Invalid index")
         exit(0)
