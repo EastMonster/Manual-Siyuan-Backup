@@ -9,5 +9,6 @@ Since then, just type `python main.py backup` to generate a backup zip file.
 
 To import your backup to Siyuan, type `python main.py restore`. You should keep in mind that it will DELETE all the files in `yourWorkspace\data` and copy backup data into it.
 
+⚠ If you have many notes, I don't recommend to use this shabby thing. This script is not fully tested, so your data may be in danger. Be careful!
 ### License
-MIT
+[MIT](https://github.com/EastMonster/Manual-Siyuan-Backup/blob/master/LICENSE)

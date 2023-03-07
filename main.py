@@ -1,8 +1,5 @@
-# Manual-Siyuan-Backup, 0.1.0
-
 import sys
 import os
-import psutil
 from util import *
 
 config = {
@@ -11,63 +8,66 @@ config = {
 }
 
 def check() -> bool:
-    if not check_env():
-        return False
+    return check_env() and check_siyuan() and check_path(config)
 
-    siyuan_path: str = os.getenv(
-        "LOCALAPPDATA") + "\\Programs\\SiYuan\\SiYuan.exe"  # type: ignore
+def do_config() -> None:
+    print("Current config: ")
+    for k, v in config.items():
+        print("    %s: %s" % (k, v))
 
-    if not os.path.exists(siyuan_path):
-        error("Siyuan is not detected")
-        return False
+    print("Available options: ")
+    print("""    1. Change workspace path
+    2. Change backup path
+    3. Delete config.json
+    0. Do nothing""")
+    print("Would you like to...[1/2/3/0]: ", end="")
 
-    pids = psutil.process_iter()
+    option = 0
+    try:
+        option = int(input())
+    except ValueError:
+        error("Invalid option")
+        exit(0)
 
-    for pid in pids:
-        if (pid.name() == "SiYuan.exe" or pid.name() == "SiYuan-Kernel.exe"):
-            error("Siyuan is running")
-            return False
+    match option:
+        case 1:
+            set_config(config, 1)
+        case 2:
+            set_config(config, 2)
+        case 3:
+            os.remove("config.json")
+        case 0:
+            return
+        case default:
+            error("Invalid option")
+            exit(0)
 
-    if not os.path.exists("config.json"):
-        print("Configure related paths (Please use slash '/'):")
-        print("Workspace path: ", end="")
-        config["workspace_path"] = input()
-        print("Backup path: ", end="")
-        config["backup_path"] = input()
-
-        if not os.path.exists(config["workspace_path"]):
-            error("Invalid workspace path")
-            exit(3)
-
-        os.makedirs(config["backup_path"], exist_ok=True)
-
-        save_config(config)
-
-    return True
+def restore() -> None:
+    if ask("This will DELETE all files in your current workspace. Continue?") is True:
+        root = config["workspace_path"] + "\\data"
+        rremove(root)
+        unzip(config["workspace_path"], config["backup_path"])
 
 def main():
     params = sys.argv
+    global config
 
     if (len(params) < 2):
         print_usage()
         exit(0)
 
-    if not check():
-        exit(1)
-
     config = load_config()
-    if config is None:
+
+    if not check():
         exit(0)
 
     match params[1]:
         case "backup":
             zipdir(config["workspace_path"], config["backup_path"])
-        case "check":
-            check()
         case "config":
-            NotImplemented
+            do_config()
         case "restore":
-            NotImplemented
+            restore()
         case default:
             print_usage()
 
