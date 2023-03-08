@@ -1,8 +1,7 @@
-import shutil
 import json
 import os
-import platform
 import psutil
+import shutil
 import sys
 import time
 import zipfile
@@ -11,7 +10,7 @@ RED = "\033[31m"
 YELLOW = "\033[33m"
 RESET = "\033[0m"
 
-USAGE = """Manual-Siyuan-Backup 0.1.0
+USAGE = """Manual-Siyuan-Backup 0.1.1
 usage: python main.py <command>
 
 These are available commands:
@@ -68,9 +67,7 @@ def load_config() -> dict[str, str]:
             config: dict = json.loads(f.read())
             keys = config.keys()
 
-            if len(
-                    keys
-            ) != 2 or "workspace_path" not in keys or "backup_path" not in keys:
+            if len(keys) != 2 or "workspace_path" not in keys or "backup_path" not in keys:
                 error("Invalid configuration file.")
                 os.remove("config.json")
                 exit(0)
@@ -102,14 +99,10 @@ def set_config(config: dict, type: int) -> None:
 
         save_config(config)
 
+
 def check_env() -> bool:
-    py_ver = platform.python_version_tuple()
     if sys.platform != "win32":  # I don't use Linux or MacOS...
         error("This script can only be run on Windows")
-    if int(py_ver[0] == 2) or (int(py_ver[0]) == 3 and
-                               int(py_ver[1]) < 10):  # I like newer things!
-        error("This script requires Python interpreter 3.10 or higher")
-        return False
     return True
 
 

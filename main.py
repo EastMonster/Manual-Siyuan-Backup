@@ -1,14 +1,13 @@
-import sys
 import os
+import sys
 from util import *
 
-config = {
-    "workspace_path": "",
-    "backup_path": ""
-}
+config = {"workspace_path": "", "backup_path": ""}
+
 
 def check() -> bool:
     return check_env() and check_siyuan() and check_path(config)
+
 
 def do_config() -> None:
     print("Current config: ")
@@ -29,24 +28,25 @@ def do_config() -> None:
         error("Invalid option")
         exit(0)
 
-    match option:
-        case 1:
-            set_config(config, 1)
-        case 2:
-            set_config(config, 2)
-        case 3:
-            os.remove("config.json")
-        case 0:
-            return
-        case default:
-            error("Invalid option")
-            exit(0)
+    if option == 1:
+        set_config(config, 1)
+    elif option == 2:
+        set_config(config, 2)
+    elif option == 3:
+        os.remove("config.json")
+    elif option == 0:
+        return
+    else:
+        error("Invalid option")
+        exit(0)
+
 
 def restore() -> None:
     if ask("This will DELETE all files in your current workspace. Continue?") is True:
         root = config["workspace_path"] + "\\data"
         rremove(root)
         unzip(config["workspace_path"], config["backup_path"])
+
 
 def main():
     params = sys.argv
@@ -61,15 +61,15 @@ def main():
     if not check():
         exit(0)
 
-    match params[1]:
-        case "backup":
-            zipdir(config["workspace_path"], config["backup_path"])
-        case "config":
-            do_config()
-        case "restore":
-            restore()
-        case default:
-            print_usage()
+    if params[1] == "backup":
+        zipdir(config["workspace_path"], config["backup_path"])
+    elif params[1] == "config":
+        do_config()
+    elif params[1] == "restore":
+        restore()
+    else:
+        print_usage()
+
 
 if __name__ == '__main__':
     main()
